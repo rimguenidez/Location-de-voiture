@@ -1,6 +1,4 @@
-
 import javax.swing.*;
-
 import java.awt.*;
 
 public class ClientPage extends JFrame {
@@ -37,11 +35,10 @@ public class ClientPage extends JFrame {
         JButton louerVoitureButton = new JButton("🚗 Louer une voiture");
         JButton retournerVoitureButton = new JButton("🔁 Retourner une voiture");
         JButton monCompteButton = new JButton("👤 Mon Compte");
-        JButton statistiquesButton = new JButton("📊 Statistiques");
         JButton menuButton = new JButton("Menu 🏠");
         JButton logoutButton = new JButton("Déconnexion 🚪");
 
-        JButton[] mainButtons = {louerVoitureButton, retournerVoitureButton, monCompteButton, statistiquesButton};
+        JButton[] mainButtons = {louerVoitureButton, retournerVoitureButton, monCompteButton};
         for (JButton button : mainButtons) {
             button.setFont(new Font("Segoe UI Emoji", Font.BOLD, 18));
             button.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -66,7 +63,6 @@ public class ClientPage extends JFrame {
             redBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         }
 
-        // Actions pour chaque bouton
         louerVoitureButton.addActionListener(e -> {
             JFrame louerFrame = new JFrame("Louer une voiture 🚘");
             louerFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -115,10 +111,6 @@ public class ClientPage extends JFrame {
             monCompteFrame.setVisible(true);
         });
 
-        statistiquesButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Affichage des statistiques", "Statistiques", JOptionPane.INFORMATION_MESSAGE);
-        });
-
         menuButton.addActionListener(e -> {
             new MainMenuAccueil();
             dispose();
@@ -128,7 +120,6 @@ public class ClientPage extends JFrame {
             System.exit(0);
         });
 
-        // Ajouter les boutons au panneau principal
         mainPanel.add(titleLabel);
         mainPanel.add(subTitle);
         mainPanel.add(louerVoitureButton);
@@ -137,15 +128,12 @@ public class ClientPage extends JFrame {
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
         mainPanel.add(monCompteButton);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-        mainPanel.add(statistiquesButton);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
         mainPanel.add(menuButton);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
         mainPanel.add(logoutButton);
 
         add(mainPanel, BorderLayout.CENTER);
 
-        // Footer
         JPanel footerPanel = new JPanel(new GridLayout(1, 3, 30, 0));
         footerPanel.setBackground(Color.DARK_GRAY);
         footerPanel.setPreferredSize(new Dimension(getWidth(), 120));

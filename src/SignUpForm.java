@@ -1,5 +1,4 @@
 import javax.swing.*;
-
 import java.awt.*;
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -10,139 +9,147 @@ public class SignUpForm extends JFrame {
 
     public SignUpForm() {
         setTitle("Créer un compte ✍");
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setSize(600, 500); 
+        setLocationRelativeTo(null);
+        setResizable(true);
+
+        // Couleur de fond du frame
+        getContentPane().setBackground(new Color(60, 63, 65));
         setLayout(new BorderLayout());
 
-        JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBackground(new Color(60, 63, 65));
+        // Panel principal qui va centrer le formulaire
+        JPanel mainPanel = new JPanel(new GridBagLayout());
+        mainPanel.setBackground(new Color(60, 63, 65));
 
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 50)));
+        // Panel formulaire, largeur max 400px mais champs s'étendent
+        JPanel formPanel = new JPanel();
+        formPanel.setBackground(new Color(60, 63, 65));
+        formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
+        formPanel.setMaximumSize(new Dimension(400, Integer.MAX_VALUE));
 
-        // Panel prénom
-        JPanel firstNamePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        firstNamePanel.setBackground(new Color(60, 63, 65));
-        JLabel firstNameLabel = new JLabel("👤 Prénom :");
-        firstNameLabel.setForeground(Color.WHITE);
-        firstNamePanel.add(firstNameLabel);
+        formPanel.add(Box.createVerticalStrut(20));
+        formPanel.add(createFieldPanel("👤 Prénom :", firstNameField = createTextField()));
+        formPanel.add(Box.createVerticalStrut(10));
+        formPanel.add(createFieldPanel("👤 Nom :", lastNameField = createTextField()));
+        formPanel.add(Box.createVerticalStrut(10));
+        formPanel.add(createFieldPanel("📧 Email :", emailField = createTextField()));
+        formPanel.add(Box.createVerticalStrut(10));
+        formPanel.add(createFieldPanel("📱 Téléphone :", phoneField = createTextField()));
+        formPanel.add(Box.createVerticalStrut(10));
+        formPanel.add(createFieldPanel("👤 Nom d'utilisateur :", usernameField = createTextField()));
+        formPanel.add(Box.createVerticalStrut(10));
+        formPanel.add(createFieldPanel("🔒 Mot de passe :", passwordField = createPasswordField()));
 
-        firstNameField = new JTextField(20);
-        firstNameField.setBackground(Color.WHITE);
-        firstNameField.setForeground(Color.BLACK);
-        firstNameField.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
-        firstNameField.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80)));
-        firstNameField.setMargin(new Insets(10, 10, 10, 10));
-        firstNamePanel.add(firstNameField);
-        contentPanel.add(firstNamePanel);
-
-        // Panel nom
-        JPanel lastNamePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lastNamePanel.setBackground(new Color(60, 63, 65));
-        JLabel lastNameLabel = new JLabel("👤 Nom :");
-        lastNameLabel.setForeground(Color.WHITE);
-        lastNamePanel.add(lastNameLabel);
-
-        lastNameField = new JTextField(20);
-        lastNameField.setBackground(Color.WHITE);
-        lastNameField.setForeground(Color.BLACK);
-        lastNameField.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
-        lastNameField.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80)));
-        lastNameField.setMargin(new Insets(10, 10, 10, 10));
-        lastNamePanel.add(lastNameField);
-        contentPanel.add(lastNamePanel);
-
-        // Panel email
-        JPanel emailPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        emailPanel.setBackground(new Color(60, 63, 65));
-        JLabel emailLabel = new JLabel("📧 Email :");
-        emailLabel.setForeground(Color.WHITE);
-        emailPanel.add(emailLabel);
-
-        emailField = new JTextField(20);
-        emailField.setBackground(Color.WHITE);
-        emailField.setForeground(Color.BLACK);
-        emailField.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
-        emailField.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80)));
-        emailField.setMargin(new Insets(10, 10, 10, 10));
-        emailPanel.add(emailField);
-        contentPanel.add(emailPanel);
-
-        // Panel téléphone
-        JPanel phonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        phonePanel.setBackground(new Color(60, 63, 65));
-        JLabel phoneLabel = new JLabel("📱 Numéro de téléphone :");
-        phoneLabel.setForeground(Color.WHITE);
-        phonePanel.add(phoneLabel);
-
-        phoneField = new JTextField(20);
-        phoneField.setBackground(Color.WHITE);
-        phoneField.setForeground(Color.BLACK);
-        phoneField.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
-        phoneField.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80)));
-        phoneField.setMargin(new Insets(10, 10, 10, 10));
-        phonePanel.add(phoneField);
-        contentPanel.add(phonePanel);
-
-        // Panel nom d'utilisateur
-        JPanel usernamePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        usernamePanel.setBackground(new Color(60, 63, 65));
-        JLabel usernameLabel = new JLabel("👤 Nom d'utilisateur :");
-        usernameLabel.setForeground(Color.WHITE);
-        usernamePanel.add(usernameLabel);
-
-        usernameField = new JTextField(20);
-        usernameField.setBackground(Color.WHITE);
-        usernameField.setForeground(Color.BLACK);
-        usernameField.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
-        usernameField.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80)));
-        usernameField.setMargin(new Insets(10, 10, 10, 10));
-        usernamePanel.add(usernameField);
-        contentPanel.add(usernamePanel);
-
-        // Panel mot de passe
-        JPanel passwordPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        passwordPanel.setBackground(new Color(60, 63, 65));
-        JLabel passwordLabel = new JLabel("🔒 Mot de passe :");
-        passwordLabel.setForeground(Color.WHITE);
-        passwordPanel.add(passwordLabel);
-
-        passwordField = new JPasswordField(20);
-        passwordField.setBackground(Color.WHITE);
-        passwordField.setForeground(Color.BLACK);
-        passwordField.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
-        passwordField.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80)));
-        passwordField.setMargin(new Insets(10, 10, 10, 10));
-        passwordPanel.add(passwordField);
-        contentPanel.add(passwordPanel);
-
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-
-        // Panel bouton
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        buttonPanel.setBackground(new Color(60, 63, 65));
+        
+        formPanel.add(Box.createVerticalStrut(50));  
 
         JButton signUpButton = new JButton("✅ Créer le compte");
-        setButtonStyle(signUpButton, new Color(34, 139, 34));
+        signUpButton.setBackground(new Color(34, 139, 34));
+        signUpButton.setForeground(Color.WHITE);
+        signUpButton.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
+        signUpButton.setFocusPainted(false);
+        signUpButton.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80)));
+        signUpButton.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+
+        // Taille préférée et max pour agrandir le bouton
+        signUpButton.setPreferredSize(new Dimension(180, 50));
+        signUpButton.setMaximumSize(new Dimension(180, 50));
+
         signUpButton.addActionListener(e -> createAccount());
-        buttonPanel.add(signUpButton);
 
-        contentPanel.add(buttonPanel);
+        formPanel.add(signUpButton);
+        formPanel.add(Box.createVerticalGlue());
 
-        getContentPane().setBackground(new Color(60, 63, 65));
-        add(contentPanel, BorderLayout.CENTER);
+        // Positionnement dans le GridBagLayout pour centrer
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;   // prendre tout l'espace horizontal
+        gbc.weighty = 1.0;   // prendre tout l'espace vertical
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
 
-        setSize(500, 650);  // Ajuster la taille pour inclure tous les champs
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setResizable(false);
+        mainPanel.add(formPanel, gbc);
+
+        add(mainPanel, BorderLayout.CENTER);
+        // Footer
+        JPanel footerPanel = new JPanel(new GridLayout(1, 3, 30, 0));
+        footerPanel.setBackground(Color.DARK_GRAY);
+        footerPanel.setPreferredSize(new Dimension(getWidth(), 120));
+
+        footerPanel.add(createFooterItem("🚗", "Voitures neuves"));
+        footerPanel.add(createFooterItem("⏰", "Service 24h/24"));
+        footerPanel.add(createFooterItem("💰", "Tarifs abordables"));
+
+        add(footerPanel, BorderLayout.SOUTH);
+
+        setVisible(true);
     }
 
-    private void setButtonStyle(JButton btn, Color color) {
-        btn.setBackground(color);
-        btn.setForeground(Color.WHITE);
-        btn.setPreferredSize(new Dimension(180, 40));
-        btn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 16));
-        btn.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80)));
-        btn.setFocusPainted(false);
+    private JPanel createFooterItem(String emoji, String text) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(Color.DARK_GRAY);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JLabel emojiLabel = new JLabel(emoji, SwingConstants.CENTER);
+        emojiLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        emojiLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 32));
+        emojiLabel.setForeground(Color.WHITE);
+
+        JLabel textLabel = new JLabel(text, SwingConstants.CENTER);
+        textLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        textLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 16));
+        textLabel.setForeground(Color.WHITE);
+        textLabel.setBorder(BorderFactory.createEmptyBorder(8, 0, 0, 0));
+
+        panel.add(emojiLabel);
+        panel.add(textLabel);
+
+        return panel;
+    }
+    
+
+    private JPanel createFieldPanel(String labelText, JTextField field) {
+        JPanel panel = new JPanel(new BorderLayout(10, 0));
+        panel.setBackground(new Color(60, 63, 65));
+
+        JLabel label = new JLabel(labelText);
+        label.setForeground(Color.WHITE);
+        label.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
+        label.setPreferredSize(new Dimension(130, 24));
+
+        field.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
+        field.setPreferredSize(new Dimension(250, 24));
+        field.setMargin(new Insets(3, 8, 3, 8));
+        field.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80)));
+
+        // Permet au champ de s'étendre horizontalement
+        field.setMinimumSize(new Dimension(250, 24));
+        field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 24));
+
+        // Pour que le panel prenne toute la largeur disponible
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+
+        panel.add(label, BorderLayout.WEST);
+        panel.add(field, BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    private JTextField createTextField() {
+        JTextField tf = new JTextField();
+        tf.setBackground(Color.WHITE);
+        tf.setForeground(Color.BLACK);
+        return tf;
+    }
+
+    private JPasswordField createPasswordField() {
+        JPasswordField pf = new JPasswordField();
+        pf.setBackground(Color.WHITE);
+        pf.setForeground(Color.BLACK);
+        return pf;
     }
 
     private void createAccount() {
@@ -153,14 +160,12 @@ public class SignUpForm extends JFrame {
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
 
-        // Validation du numéro de téléphone (s'il est vide ou invalide)
-        if (phone.isEmpty() || !phone.matches("\\d{10}")) {
-            JOptionPane.showMessageDialog(this, "Numéro de téléphone invalide. Il doit contenir 10 chiffres.", "Erreur", JOptionPane.ERROR_MESSAGE);
+        if (phone.isEmpty() || !phone.matches("\\d{8}")) {
+            JOptionPane.showMessageDialog(this, "Numéro de téléphone invalide (8 chiffres).", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/bdproject", "root", "12chocolate")) {
-            // Enregistrement dans le tableau user
             String query = "INSERT INTO users (username, password, role, email, telephone, created_at) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             stmt.setString(1, username);
@@ -171,26 +176,24 @@ public class SignUpForm extends JFrame {
             stmt.setString(6, LocalDateTime.now().toString());
             stmt.executeUpdate();
 
-            // Récupérer l'ID généré
             ResultSet generatedKeys = stmt.getGeneratedKeys();
             int userId = -1;
             if (generatedKeys.next()) {
                 userId = generatedKeys.getInt(1);
             }
 
-            // Enregistrement dans le tableau client
             if (userId != -1) {
                 String clientQuery = "INSERT INTO client (id_client, nom, prenom) VALUES (?, ?, ?)";
                 PreparedStatement clientStmt = conn.prepareStatement(clientQuery);
                 clientStmt.setInt(1, userId);
-                clientStmt.setString(2, firstName);
-                clientStmt.setString(3, lastName);
+                clientStmt.setString(2, lastName);
+                clientStmt.setString(3, firstName);
                 clientStmt.executeUpdate();
             }
 
             JOptionPane.showMessageDialog(this, "Compte créé avec succès 🎉 !");
-            dispose(); // Ferme la fenêtre actuelle
-            new ClientPage(username, userId).setVisible(true); // Redirige vers l’espace client avec le username et userId
+            dispose();
+            
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Erreur lors de la création du compte.", "Erreur", JOptionPane.ERROR_MESSAGE);

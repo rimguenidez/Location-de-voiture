@@ -1,7 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.sql.*;
 
 public class GererVoitures extends JPanel {
@@ -11,10 +10,13 @@ public class GererVoitures extends JPanel {
     private JComboBox<String> cmbEtat, cmbCouleur;
     private JCheckBox chkDisponible;
     private Connection connection;
+    private String username;
 
-    public GererVoitures(CardLayout layout, JPanel cont) {
+    public GererVoitures(CardLayout layout, JPanel cont, String username) {
+        this.username = username;
         this.cardLayout = layout;
         this.container = cont;
+
         setSize(700, 650);
         setLayout(new BorderLayout(10, 10));
         setBackground(new Color(35, 35, 35));
@@ -41,8 +43,8 @@ public class GererVoitures extends JPanel {
         JLabel lbl2 = new JLabel("Marque :");
         JLabel lbl3 = new JLabel("Modèle :");
         JLabel lbl4 = new JLabel("État :");
-        JLabel lbl6 = new JLabel("Couleur :");
         JLabel lbl5 = new JLabel("Disponible :");
+        JLabel lbl6 = new JLabel("Couleur :");
 
         for (JLabel lbl : new JLabel[]{lbl1, lbl2, lbl3, lbl4, lbl5, lbl6}) {
             lbl.setForeground(labelColor);
@@ -53,8 +55,8 @@ public class GererVoitures extends JPanel {
         txtMarque = new JTextField();
         txtModele = new JTextField();
         cmbEtat = new JComboBox<>(new String[]{"en_marche", "en_panne"});
-        chkDisponible = new JCheckBox();
         cmbCouleur = new JComboBox<>(new String[]{"Rouge", "Bleu", "Vert", "Noir", "Blanc", "Gris", "Jaune"});
+        chkDisponible = new JCheckBox();
         chkDisponible.setPreferredSize(new Dimension(25, 25));
 
         JTextField[] textFields = {txtImmatriculation, txtMarque, txtModele};
@@ -82,21 +84,16 @@ public class GererVoitures extends JPanel {
         formPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         formPanel.add(createRow(lbl4, cmbEtat));
         formPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        // Déplacez la ligne "Couleur" ici, avant "Disponible"
         formPanel.add(createRow(lbl6, cmbCouleur));
         formPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        // Puis la ligne "Disponible" vient après
         formPanel.add(createRow(lbl5, chkDisponible));
 
-        // Boutons
         JButton ajouter = new JButton("➕ Ajouter");
         JButton modifier = new JButton("✏️ Modifier");
         JButton supprimer = new JButton("🗑️ Supprimer");
-        JButton men = new JButton("⬅️ Menu");
+        JButton retour = new JButton("🔙 Retour");
 
-        for (JButton btn : new JButton[]{ajouter, modifier, supprimer, men}) {
+        for (JButton btn : new JButton[]{ajouter, modifier, supprimer, retour}) {
             btn.setBackground(new Color(34, 139, 34));
             btn.setForeground(Color.WHITE);
             btn.setFocusPainted(false);
@@ -109,38 +106,21 @@ public class GererVoitures extends JPanel {
         buttonPanel.add(ajouter);
         buttonPanel.add(modifier);
         buttonPanel.add(supprimer);
-        buttonPanel.add(men);
+        buttonPanel.add(retour);
 
         formPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         formPanel.add(buttonPanel);
 
         add(formPanel, BorderLayout.CENTER);
 
-        ajouter.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                ajouterVoiture();
-            }
-        });
+        ajouter.addActionListener(e -> ajouterVoiture());
+        modifier.addActionListener(e -> modifierVoiture());
+        supprimer.addActionListener(e -> supprimerVoiture());
 
-        modifier.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                modifierVoiture();
-            }
+        retour.addActionListener(e -> {
+            container.add(new AdminPage(username), "AdminPage");
+            cardLayout.show(container, "AdminPage");
         });
-
-        supprimer.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                supprimerVoiture();
-            }
-        });
-
-        men.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                cardLayout.show(container, "Menu");
-            }
-        });
-
-        setVisible(true);
     }
 
     private JPanel createRow(JLabel label, JComponent field) {
@@ -150,14 +130,11 @@ public class GererVoitures extends JPanel {
         labelFieldPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         label.setPreferredSize(new Dimension(150, 30));
-        label.setForeground(Color.WHITE);
-        label.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
         labelFieldPanel.add(label);
         labelFieldPanel.add(Box.createHorizontalStrut(10));
         labelFieldPanel.add(field);
 
-        JPanel wrapper = new JPanel();
-        wrapper.setLayout(new BorderLayout());
+        JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setBackground(new Color(40, 40, 40));
         wrapper.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(5, 0, 5, 0),
@@ -181,9 +158,9 @@ public class GererVoitures extends JPanel {
             PreparedStatement pverif = connection.prepareStatement(verif);
             pverif.setString(1, immatriculation);
             ResultSet rs = pverif.executeQuery();
+
             if (rs.next()) {
                 JOptionPane.showMessageDialog(this, "Voiture avec cette immatriculation existe déjà !");
-                return;
             } else {
                 String sql = "INSERT INTO voiture(immatriculation, marque, modele, etat, disponible, couleur) VALUES (?, ?, ?, ?, ?, ?)";
                 PreparedStatement p = connection.prepareStatement(sql);
@@ -216,6 +193,7 @@ public class GererVoitures extends JPanel {
             PreparedStatement pverif = connection.prepareStatement(verif);
             pverif.setString(1, immatriculation);
             ResultSet rs = pverif.executeQuery();
+
             if (rs.next()) {
                 String sql = "UPDATE voiture SET marque=?, modele=?, etat=?, disponible=?, couleur=? WHERE immatriculation=?";
                 PreparedStatement p = connection.prepareStatement(sql);
@@ -229,7 +207,7 @@ public class GererVoitures extends JPanel {
                 JOptionPane.showMessageDialog(this, "Voiture modifiée avec succès!");
                 clearFields();
             } else {
-                JOptionPane.showMessageDialog(this, "Voiture avec cette immatriculation n'existe pas dans la base !");
+                JOptionPane.showMessageDialog(this, "Voiture avec cette immatriculation n'existe pas !");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -245,6 +223,7 @@ public class GererVoitures extends JPanel {
             PreparedStatement pverif = connection.prepareStatement(verif);
             pverif.setString(1, immatriculation);
             ResultSet rs = pverif.executeQuery();
+
             if (rs.next()) {
                 String sql = "DELETE FROM voiture WHERE immatriculation=?";
                 PreparedStatement p = connection.prepareStatement(sql);
@@ -253,7 +232,7 @@ public class GererVoitures extends JPanel {
                 JOptionPane.showMessageDialog(this, "Voiture supprimée avec succès!");
                 clearFields();
             } else {
-                JOptionPane.showMessageDialog(this, "Voiture avec cette immatriculation n'existe pas dans la base !");
+                JOptionPane.showMessageDialog(this, "Voiture introuvable !");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -270,6 +249,10 @@ public class GererVoitures extends JPanel {
         cmbCouleur.setSelectedIndex(0);
     }
 
+    public String getusername() {
+        return username;
+    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Gestion des Voitures 🚗");
@@ -280,9 +263,10 @@ public class GererVoitures extends JPanel {
             CardLayout layout = new CardLayout();
             JPanel container = new JPanel(layout);
 
-            GererVoitures gv = new GererVoitures(layout, container);
-            container.add(gv, "GererVoitures");
+            String username = "admin";
+            GererVoitures gv = new GererVoitures(layout, container, username);
 
+            container.add(gv, "GererVoitures");
             frame.setContentPane(container);
             layout.show(container, "GererVoitures");
             frame.setVisible(true);

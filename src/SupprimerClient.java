@@ -1,135 +1,171 @@
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.sql.*;
 
 public class SupprimerClient extends JFrame {
-    private JTextField idField;
+    private JTextField searchField;
+    private JTable table;
+    private DefaultTableModel tableModel;
 
     public SupprimerClient() {
         setTitle("Supprimer un Client ❌");
-        setSize(600, 400);
+        setSize(900, 550);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(new Color(45, 45, 45));
-        panel.setBorder(BorderFactory.createEmptyBorder(30, 60, 30, 60));
 
-        JLabel title = new JLabel("Supprimer un Client 🗑️");
-        title.setFont(new Font("Segoe UI Emoji", Font.BOLD, 28));
-        title.setForeground(Color.WHITE);
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // Barre de recherche
+        JPanel searchPanel = new JPanel(new FlowLayout());
+        searchPanel.setBackground(new Color(45, 45, 45));
 
-        JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setBackground(new Color(45, 45, 45));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
+        JLabel searchLabel = new JLabel("Rechercher par username :");
+        searchLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
+        searchLabel.setForeground(Color.WHITE);
 
-        JLabel idLabel = new JLabel("ID Client à supprimer :");
-        idLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
-        idLabel.setForeground(Color.WHITE);
-        idField = new JTextField(20);
-        idField.setPreferredSize(new Dimension(300, 35));
+        searchField = new JTextField(20);
+        searchField.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        formPanel.add(idLabel, gbc);
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        formPanel.add(idField, gbc);
-
-        JButton supprimerBtn = new JButton("Supprimer ❌");
-        supprimerBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 18));
-        supprimerBtn.setBackground(new Color(200, 0, 0));
-        supprimerBtn.setForeground(Color.WHITE);
-        supprimerBtn.setFocusPainted(false);
-        supprimerBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        supprimerBtn.setMaximumSize(new Dimension(300, 40));
-
-        JButton retourBtn = new JButton("Retour 🔙");
-        retourBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 18));
-        retourBtn.setBackground(new Color(34, 177, 76));
-        retourBtn.setForeground(Color.WHITE);
-        retourBtn.setFocusPainted(false);
-        retourBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        retourBtn.setMaximumSize(new Dimension(300, 40));
-
-        supprimerBtn.addActionListener((ActionEvent e) -> {
-            String id = idField.getText().trim();
-
-            if (id.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Veuillez entrer un ID valide.");
-                return;
+        // Recherche instantanée
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) {
+                searchClients();
             }
 
-            int confirm = JOptionPane.showConfirmDialog(this, "Voulez-vous vraiment supprimer ce client et toutes ses locations ?", "Confirmation", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/bdproject", "root", "12chocolate")) {
+            public void removeUpdate(DocumentEvent e) {
+                searchClients();
+            }
 
-                    // Vérifie si le client existe
-                    String check = "SELECT * FROM client WHERE id_client = ?";
-                    try (PreparedStatement checkStmt = conn.prepareStatement(check)) {
-                        checkStmt.setInt(1, Integer.parseInt(id));
-                        ResultSet rs = checkStmt.executeQuery();
-
-                        if (!rs.next()) {
-                            JOptionPane.showMessageDialog(this, "Aucun client trouvé avec cet ID !");
-                            return;
-                        }
-                    }
-
-                    // Supprimer d'abord les locations
-                    String deleteLocations = "DELETE FROM location WHERE id_client = ?";
-                    try (PreparedStatement stmt = conn.prepareStatement(deleteLocations)) {
-                        stmt.setInt(1, Integer.parseInt(id));
-                        stmt.executeUpdate();
-                    }
-
-                    // Supprimer de la table client
-                    String deleteClient = "DELETE FROM client WHERE id_client=?";
-                    try (PreparedStatement stmt = conn.prepareStatement(deleteClient)) {
-                        stmt.setInt(1, Integer.parseInt(id));
-                        stmt.executeUpdate();
-                    }
-
-                    // Supprimer de la table users
-                    String deleteUser = "DELETE FROM users WHERE id=?";
-                    try (PreparedStatement stmt = conn.prepareStatement(deleteUser)) {
-                        stmt.setInt(1, Integer.parseInt(id));
-                        stmt.executeUpdate();
-                    }
-
-                    JOptionPane.showMessageDialog(this, "Client et ses locations supprimés avec succès !");
-                    idField.setText("");
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(this, "Erreur SQL : " + ex.getMessage());
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(this, "ID invalide. Veuillez entrer un entier.");
-                }
+            public void changedUpdate(DocumentEvent e) {
+                searchClients();
             }
         });
 
+        searchPanel.add(searchLabel);
+        searchPanel.add(searchField);
+
+        // Tableau
+        tableModel = new DefaultTableModel(new String[]{"ID", "Nom", "Prénom", "Username", "Email"}, 0);
+        table = new JTable(tableModel);
+        table.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
+        table.setRowHeight(25);
+
+        JTableHeader header = table.getTableHeader();
+        header.setFont(new Font("Segoe UI Emoji", Font.BOLD, 16));
+
+        JScrollPane scrollPane = new JScrollPane(table);
+
+        // Boutons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(new Color(45, 45, 45));
+
+        JButton deleteBtn = new JButton("Supprimer le client sélectionné ❌");
+        JButton retourBtn = new JButton("Retour 🔙");
+
+        deleteBtn.setBackground(new Color(200, 0, 0));
+        deleteBtn.setForeground(Color.WHITE);
+        deleteBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 16));
+        deleteBtn.setFocusPainted(false);
+
+        retourBtn.setBackground(new Color(34, 177, 76));
+        retourBtn.setForeground(Color.WHITE);
+        retourBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 16));
+        retourBtn.setFocusPainted(false);
+
+        deleteBtn.addActionListener(e -> deleteSelectedClient());
         retourBtn.addActionListener(e -> {
             new GererClientApp();
             dispose();
         });
 
-        panel.add(title);
-        panel.add(Box.createRigidArea(new Dimension(0, 20)));
-        panel.add(formPanel);
-        panel.add(Box.createRigidArea(new Dimension(0, 20)));
-        panel.add(supprimerBtn);
-        panel.add(Box.createRigidArea(new Dimension(0, 15)));
-        panel.add(retourBtn);
+        buttonPanel.add(deleteBtn);
+        buttonPanel.add(retourBtn);
 
-        add(panel, BorderLayout.CENTER);
+        panel.add(searchPanel, BorderLayout.NORTH);
+        panel.add(scrollPane, BorderLayout.CENTER);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
+
+        add(panel);
         setVisible(true);
+
+        // Charger tous les clients au démarrage
+        searchClients();
+    }
+
+    private void searchClients() {
+        String keyword = searchField.getText().trim();
+        tableModel.setRowCount(0); // Vider le tableau
+
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/bdproject", "root", "12chocolate")) {
+            String query = "SELECT u.id, c.nom, c.prenom, u.username, u.email " +
+                           "FROM users u JOIN client c ON u.id = c.id_client " +
+                           "WHERE u.role = 'client' AND u.username LIKE ?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, "%" + keyword + "%");
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                tableModel.addRow(new Object[]{
+                        rs.getInt("id"),
+                        rs.getString("nom"),
+                        rs.getString("prenom"),
+                        rs.getString("username"),
+                        rs.getString("email")
+                });
+            }
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Erreur SQL : " + ex.getMessage());
+        }
+    }
+
+    private void deleteSelectedClient() {
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Veuillez sélectionner un client à supprimer.");
+            return;
+        }
+
+        int id = (int) tableModel.getValueAt(selectedRow, 0);
+        int confirm = JOptionPane.showConfirmDialog(this, "Êtes-vous sûr de vouloir supprimer ce client ?", "Confirmation", JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/bdproject", "root", "12chocolate")) {
+
+                // Supprimer locations
+                try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM location WHERE id_client = ?")) {
+                    stmt.setInt(1, id);
+                    stmt.executeUpdate();
+                }
+
+                // Supprimer client
+                try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM client WHERE id_client = ?")) {
+                    stmt.setInt(1, id);
+                    stmt.executeUpdate();
+                }
+
+                // Supprimer user
+                try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM users WHERE id = ?")) {
+                    stmt.setInt(1, id);
+                    stmt.executeUpdate();
+                }
+
+                JOptionPane.showMessageDialog(this, "Client supprimé avec succès !");
+                tableModel.removeRow(selectedRow);
+
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Erreur lors de la suppression : " + ex.getMessage());
+            }
+        }
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new SupprimerClient());
+        SwingUtilities.invokeLater(SupprimerClient::new);
     }
 }

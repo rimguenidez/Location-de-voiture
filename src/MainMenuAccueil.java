@@ -39,26 +39,26 @@ public class MainMenuAccueil extends JFrame {
             button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         }
 
-        // Style bouton quitter (rouge)
+        // Style bouton quitter
         quitButton.setFont(new Font("Segoe UI Emoji", Font.BOLD, 18));
         quitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         quitButton.setMaximumSize(new Dimension(300, 50));
         quitButton.setBackground(Color.RED);
         quitButton.setForeground(Color.WHITE);
         quitButton.setFocusPainted(false);
-        quitButton.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        
         quitButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // Actions
+        // Les Actions
         loginButton.addActionListener(e -> {
-            new LoginForm().setVisible(true); // Remplace par ton interface de connexion
+            new LoginForm().setVisible(true); 
             dispose();
         });
 
-        signUpButton.addActionListener(e -> new SignUpForm().setVisible(true)); // Remplace ici aussi
+        signUpButton.addActionListener(e -> new SignUpForm().setVisible(true)); 
 
         aboutButton.addActionListener(e -> JOptionPane.showMessageDialog(this,
-                "Contact : +213 123 456 789\nEmail : contact@voitures.com\nDéveloppé par: Rim Guenidez et Mohamed Amine Nebli ",
+                "Contact : +216 23 456 789\nEmail : contact@voitures.com\nDéveloppé par: Rim Guenidez, Mohamed Amine Nebli et Rayen Guedri",
                 "À propos", JOptionPane.INFORMATION_MESSAGE));
 
         quitButton.addActionListener(e -> System.exit(0));
@@ -74,7 +74,7 @@ public class MainMenuAccueil extends JFrame {
 
         add(mainPanel, BorderLayout.CENTER);
 
-        // Pied de page
+        // Footer
         JPanel footerPanel = new JPanel(new GridLayout(1, 3, 30, 0));
         footerPanel.setBackground(Color.DARK_GRAY);
         footerPanel.setPreferredSize(new Dimension(getWidth(), 120));

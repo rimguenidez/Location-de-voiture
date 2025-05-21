@@ -32,10 +32,10 @@ public class AfficherClient extends JFrame {
 
         JLabel searchLabel = new JLabel("🔍 Rechercher username : ");
         searchLabel.setForeground(Color.WHITE);
-        searchLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        searchLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
 
         searchField = new JTextField(20);
-        searchField.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        searchField.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
         searchField.setPreferredSize(new Dimension(200, 30));
 
         searchPanel.add(searchLabel);
@@ -48,9 +48,9 @@ public class AfficherClient extends JFrame {
         }, 0);
 
         table = new JTable(tableModel);
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        table.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
         table.setRowHeight(28);
-        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 16));
+        table.getTableHeader().setFont(new Font("Segoe UI Emoji", Font.BOLD, 16));
 
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);

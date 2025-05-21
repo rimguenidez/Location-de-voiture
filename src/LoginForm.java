@@ -1,7 +1,5 @@
 import javax.swing.*;
-
 import java.awt.*;
-import java.awt.event.*;
 import java.sql.*;
 
 public class LoginForm extends JFrame {
@@ -12,14 +10,18 @@ public class LoginForm extends JFrame {
         setTitle("Connexion");
         setLayout(new BorderLayout());
 
+        Color backgroundColor = new Color(60, 63, 65); // gris clair
+
+        // Panel principal
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBackground(new Color(60, 63, 65));
+        contentPanel.setBackground(backgroundColor);
         contentPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         contentPanel.add(Box.createRigidArea(new Dimension(0, 50)));
 
+        // Champ nom d'utilisateur
         JPanel usernamePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        usernamePanel.setBackground(new Color(60, 63, 65));
+        usernamePanel.setBackground(backgroundColor);
         JLabel usernameLabel = new JLabel("Nom d'utilisateur :");
         usernameLabel.setForeground(Color.WHITE);
         usernamePanel.add(usernameLabel);
@@ -33,8 +35,9 @@ public class LoginForm extends JFrame {
         usernamePanel.add(usernameField);
         contentPanel.add(usernamePanel);
 
+        // Champ mot de passe
         JPanel passwordPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        passwordPanel.setBackground(new Color(60, 63, 65));
+        passwordPanel.setBackground(backgroundColor);
         JLabel passwordLabel = new JLabel("Mot de passe :");
         passwordLabel.setForeground(Color.WHITE);
         passwordPanel.add(passwordLabel);
@@ -47,10 +50,12 @@ public class LoginForm extends JFrame {
         passwordField.setMargin(new Insets(10, 10, 10, 10));
         passwordPanel.add(passwordField);
         contentPanel.add(passwordPanel);
+
         contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
+        // Les boutons 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        buttonPanel.setBackground(new Color(60, 63, 65));
+        buttonPanel.setBackground(backgroundColor);
 
         JButton loginButton = new JButton("🔑 Se connecter");
         setButtonStyle(loginButton, new Color(34, 139, 34));
@@ -58,24 +63,70 @@ public class LoginForm extends JFrame {
         buttonPanel.add(loginButton);
 
         JButton signUpButton = new JButton("✍ Créer un compte");
-        setButtonStyle(signUpButton, new Color(255, 69, 0));
+        setButtonStyle(signUpButton, new Color(255, 69, 0), new Dimension(180, 40));
         signUpButton.addActionListener(e -> new SignUpForm().setVisible(true));
         buttonPanel.add(signUpButton);
 
         contentPanel.add(buttonPanel);
-        getContentPane().setBackground(new Color(60, 63, 65));
+
+        getContentPane().setBackground(backgroundColor);
         add(contentPanel, BorderLayout.CENTER);
 
-        setSize(500, 400);
+        // Footer
+        JPanel footerPanel = new JPanel(new GridLayout(1, 3, 30, 0));
+        footerPanel.setBackground(backgroundColor);
+        footerPanel.setPreferredSize(new Dimension(getWidth(), 120));
+
+        footerPanel.add(createFooterItem("🚗", "Voitures neuves"));
+        footerPanel.add(createFooterItem("⏰", "Service 24h/24"));
+        footerPanel.add(createFooterItem("💰", "Tarifs abordables"));
+
+        add(footerPanel, BorderLayout.SOUTH);
+
+        // Fenêtre
+        setSize(500, 420);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
+        setVisible(true);
+    }
+
+    private JPanel createFooterItem(String emoji, String text) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(new Color(60, 63, 65));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JLabel emojiLabel = new JLabel(emoji, SwingConstants.CENTER);
+        emojiLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        emojiLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 32));
+        emojiLabel.setForeground(Color.WHITE);
+
+        JLabel textLabel = new JLabel(text, SwingConstants.CENTER);
+        textLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        textLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 16));
+        textLabel.setForeground(Color.WHITE);
+        textLabel.setBorder(BorderFactory.createEmptyBorder(8, 0, 0, 0));
+
+        panel.add(emojiLabel);
+        panel.add(textLabel);
+
+        return panel;
     }
 
     private void setButtonStyle(JButton btn, Color color) {
         btn.setBackground(color);
         btn.setForeground(Color.WHITE);
         btn.setPreferredSize(new Dimension(150, 40));
+        btn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 16));
+        btn.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80)));
+        btn.setFocusPainted(false);
+    }
+
+    private void setButtonStyle(JButton btn, Color color, Dimension size) {
+        btn.setBackground(color);
+        btn.setForeground(Color.WHITE);
+        btn.setPreferredSize(size);
         btn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 16));
         btn.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80)));
         btn.setFocusPainted(false);
@@ -99,7 +150,7 @@ public class LoginForm extends JFrame {
                 if ("client".equals(role)) {
                     CardLayout layout = new CardLayout();
                     JPanel container = new JPanel(layout);
-                    ClientPage panel = new ClientPage(username, id);  // 🟢 id + username
+                    ClientPage panel = new ClientPage(username, id);
                     container.add(panel, "GererLocations");
                     layout.show(container, "GererLocations");
 
@@ -118,6 +169,7 @@ public class LoginForm extends JFrame {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur de connexion à la base de données", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
     }
 

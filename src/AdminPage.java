@@ -41,7 +41,7 @@ public class AdminPage extends JFrame {
         for (JButton button : buttons) {
             button.setFont(new Font("Segoe UI Emoji", Font.BOLD, 18));
             button.setAlignmentX(Component.CENTER_ALIGNMENT);
-            button.setMaximumSize(new Dimension(300, 45)); // Taille réduite
+            button.setMaximumSize(new Dimension(300, 45));
             button.setForeground(Color.WHITE);
             button.setFocusPainted(false);
             button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -58,14 +58,15 @@ public class AdminPage extends JFrame {
         }
 
         manageClientsButton.addActionListener(e -> {
-            new GererClientApp(); 
+            new GererClientApp();
             dispose();
         });
 
         manageCarsButton.addActionListener(e -> {
             CardLayout cardLayout = new CardLayout();
             JPanel container = new JPanel(cardLayout);
-            GererVoitures gv = new GererVoitures(cardLayout, container);
+
+            GererVoitures gv = new GererVoitures(cardLayout, container, username); // si GererVoitures accepte ces paramètres
             container.add(gv, "GererVoitures");
             cardLayout.show(container, "GererVoitures");
 
@@ -82,8 +83,10 @@ public class AdminPage extends JFrame {
         statisticsButton.addActionListener(e -> {
             CardLayout layout = new CardLayout();
             JPanel container = new JPanel(layout);
-            Statistiques statistiques = new Statistiques(layout, container);
+
+            Statistiques statistiques = new Statistiques(layout, container, username); // username passé ici
             container.add(statistiques, "stats");
+            layout.show(container, "stats");
 
             JFrame frame = new JFrame("Statistiques 📊");
             frame.setContentPane(container);
@@ -120,7 +123,7 @@ public class AdminPage extends JFrame {
 
         JPanel footerPanel = new JPanel(new GridLayout(1, 3, 30, 0));
         footerPanel.setBackground(Color.DARK_GRAY);
-        footerPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50)); // Espace entre footer et le reste
+        footerPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
         footerPanel.add(createFooterItem("🚗", "Voitures neuves"));
         footerPanel.add(createFooterItem("⏰", "Service 24h/24"));

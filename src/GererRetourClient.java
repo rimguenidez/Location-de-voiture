@@ -85,7 +85,7 @@ public class GererRetourClient extends JPanel {
         menu.addActionListener(e -> {
             JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
             topFrame.dispose();
-            new MainMenuAccueil().setVisible(true);
+            new ClientPage(username,idClient).setVisible(true);
         });
     }
 

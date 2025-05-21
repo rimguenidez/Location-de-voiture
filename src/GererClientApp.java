@@ -65,6 +65,7 @@ public class GererClientApp extends JFrame {
         add(panel, BorderLayout.CENTER);
 
         setVisible(true);
+        
     }
 
     public static void main(String[] args) {
