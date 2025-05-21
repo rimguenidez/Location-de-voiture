@@ -42,9 +42,9 @@ public class AfficherClient extends JFrame {
         searchPanel.add(searchField);
         add(searchPanel, BorderLayout.BEFORE_FIRST_LINE);
 
-        // Tableau
+        // Tableau sans colonne mot de passe
         tableModel = new DefaultTableModel(new String[]{
-                "ID", "Nom", "Prénom", "Téléphone", "Username", "Password"
+                "ID", "Nom", "Prénom", "Téléphone", "Username"
         }, 0);
 
         table = new JTable(tableModel);
@@ -63,7 +63,7 @@ public class AfficherClient extends JFrame {
         retourBtn.setFocusPainted(false);
         retourBtn.setPreferredSize(new Dimension(120, 40));
         retourBtn.addActionListener(e -> {
-            new GererClientApp();
+            new GererClientApp(); // Assure-toi que cette classe existe
             dispose();
         });
 
@@ -72,7 +72,7 @@ public class AfficherClient extends JFrame {
         bottomPanel.add(retourBtn);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        // Charger et filtrer
+        // Charger les clients au départ
         chargerClients("");
         searchField.addKeyListener(new KeyAdapter() {
             public void keyReleased(KeyEvent e) {
@@ -85,11 +85,11 @@ public class AfficherClient extends JFrame {
     }
 
     private void chargerClients(String usernameSearch) {
-        tableModel.setRowCount(0); // clear table
+        tableModel.setRowCount(0); // Vider le tableau
 
         try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/bdproject", "root", "12chocolate")) {
             String query = """
-                    SELECT c.id_client, c.nom, c.prenom, u.telephone, u.username, u.password
+                    SELECT c.id_client, c.nom, c.prenom, u.telephone, u.username
                     FROM client c
                     JOIN users u ON u.id = c.id_client
                     WHERE u.username LIKE ?
@@ -104,9 +104,8 @@ public class AfficherClient extends JFrame {
                         String prenom = rs.getString("prenom");
                         String tel = rs.getString("telephone");
                         String username = rs.getString("username");
-                        String password = rs.getString("password");
 
-                        tableModel.addRow(new Object[]{id, nom, prenom, tel, username, password});
+                        tableModel.addRow(new Object[]{id, nom, prenom, tel, username});
                     }
                 }
             }
